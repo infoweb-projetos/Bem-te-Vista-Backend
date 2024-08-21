@@ -27,6 +27,11 @@ export class UsuariosService {
         return this.prisma.user.findMany();
     }
 
+    async findByEmail(email: string) {
+        return this.prisma.user.findUnique({
+          where: { email },
+        });
+    }
     async update(id: string, data: UsuarioDTO){
         const userExists = await this.prisma.user.findUnique({
             where: {

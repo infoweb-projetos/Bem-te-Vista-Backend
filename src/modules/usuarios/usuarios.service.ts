@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsuarioDTO } from './usuario.dto';
 import { PrismaService } from 'src/database/PrismaService';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuariosService {
@@ -8,20 +9,31 @@ export class UsuariosService {
     constructor(private prisma: PrismaService) {}
 
     async create(data: UsuarioDTO) {
+        // Hash da senha do usuário
+        const hashedPassword = await bcrypt.hash(data.senha, 10);
+    
+        // Verifica se o usuário já existe
         const userExists = await this.prisma.user.findFirst({
             where: {
-                email: data.email
-            }
-        })
-        if(userExists){
-            throw new Error('Email já cadastrado')
+                email: data.email,
+            },
+        });
+        
+        if (userExists) {
+            throw new Error('Email já cadastrado');
         }
         
+        // Cria o novo usuário com a senha criptografada
         const user = await this.prisma.user.create({
-            data,
-    })
-    return user;
-}
+            data: {
+                ...data,
+                senha: hashedPassword,
+            },
+        });
+    
+        return user;
+    }
+    
 
     async findAll(){
         return this.prisma.user.findMany();
@@ -29,7 +41,7 @@ export class UsuariosService {
 
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
-          where: { email },
+            where: { email },
         });
     }
     async update(id: string, data: UsuarioDTO){

@@ -17,3 +17,8 @@ model User {
 
   @@map("Usuarios")
 }
+
+model Estilo {
+  id   String @id @default(uuid())
+  nome String @unique
+}

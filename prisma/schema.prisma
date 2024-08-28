@@ -7,18 +7,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id String @id @default(uuid())
-  nome String
-  nome_de_usuario String @unique
-  email String @unique
-  senha String
+  id              String       @id @default(uuid())
+  nome            String
+  nome_de_usuario String       @unique
+  email           String       @unique
+  senha           String
+  estilos         UserEstilo[] // Removei a especificação de relacionamento aqui para o padrão.
 
   @@map("Usuarios")
 }
 
 model Estilo {
-  id   String @id @default(uuid())
-  nome String @unique
+  id       String       @id @default(uuid())
+  nome     String       @unique
+  usuarios UserEstilo[] // Removei a especificação de relacionamento aqui para o padrão.
+}
+
+model UserEstilo {
+  userId   String
+  estiloId String
+
+  user     User   @relation(fields: [userId], references: [id])
+  estilo   Estilo @relation(fields: [estiloId], references: [id])
+
+  @@id([userId, estiloId])
 }

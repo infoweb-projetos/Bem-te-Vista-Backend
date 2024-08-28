@@ -44,6 +44,7 @@ export class UsuariosService {
             where: { email },
         });
     }
+    
     async update(id: string, data: UsuarioDTO){
         const userExists = await this.prisma.user.findUnique({
             where: {
@@ -51,7 +52,7 @@ export class UsuariosService {
             },
         })
 
-        if(userExists) {
+        if(!userExists) {
             throw new Error('Esse usuário não existe');
         }
         return await this.prisma.user.update({
@@ -69,7 +70,7 @@ export class UsuariosService {
             },
         });
 
-        if(userExists) {
+        if(!userExists) {
             throw new Error('Esse usuário não existe');
         }
 
@@ -79,4 +80,31 @@ export class UsuariosService {
             },
         });
     }
+
+    async updateStyles(userId: string, styles: string[]) {
+        // Verifica se o usuário existe
+        const userExists = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+    
+        if (!userExists) {
+            throw new Error('Usuário não encontrado');
+        }
+    
+        // Remove os estilos existentes do usuário
+        await this.prisma.userEstilo.deleteMany({
+            where: { userId },
+        });
+    
+        // Adiciona os novos estilos
+        const userStyles = styles.map(styleId => ({
+            userId,
+            estiloId: styleId,
+        }));
+    
+        return this.prisma.userEstilo.createMany({
+            data: userStyles,
+        });
+    }
+    
 }

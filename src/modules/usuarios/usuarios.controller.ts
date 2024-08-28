@@ -25,6 +25,11 @@ export class UsuariosController {
   async delete(@Param('id') id: string){
     return this.usuariosService.delete(id);
   }
- 
-  }
 
+
+  @Post(':id/styles')
+async updateStyles(@Param('id') userId: string, @Body() body: { styles: string[] }) {
+    return this.usuariosService.updateStyles(userId, body.styles);
+}
+
+}

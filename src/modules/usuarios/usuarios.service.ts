@@ -82,29 +82,49 @@ export class UsuariosService {
     }
 
     async updateStyles(userId: string, styles: string[]) {
-        // Verifica se o usuário existe
-        const userExists = await this.prisma.user.findUnique({
+        console.log('Atualizando estilos para o usuário:', userId); // Adicionar log para verificar o ID
+      
+        try {
+          const user = await this.prisma.user.findUnique({
             where: { id: userId },
-        });
-    
-        if (!userExists) {
-            throw new Error('Usuário não encontrado');
+          });
+      
+          if (!user) {
+            throw new Error(`Usuário com ID ${userId} não encontrado`); // Mensagem de erro mais específica
+          }
+      
+          // Validar os estilos
+          const validStyles = await Promise.all(
+            styles.map(async (styleId) => {
+              const style = await this.prisma.estilo.findUnique({
+                where: { id: styleId },
+              });
+              return style;
+            })
+          );
+      
+          const invalidStyles = validStyles.filter((style) => !style);
+          if (invalidStyles.length > 0) {
+            throw new Error(`Os seguintes estilos não foram encontrados: ${invalidStyles.join(', ')}`);
+          }
+      
+          // Transação para garantir a consistência dos dados
+          await this.prisma.$transaction(async (prisma) => {
+            // Remover associações existentes
+            await prisma.userEstilo.deleteMany({ where: { userId } });
+      
+            // Criar novas associações
+            await prisma.userEstilo.createMany({
+              data: validStyles.map((style) => ({
+                userId,
+                estiloId: style.id,
+              })),
+            });
+          });
+        }  catch (error) {
+            console.error('Erro ao atualizar estilos:', error);
+            throw new Error('Ocorreu um erro ao atualizar os estilos.');
+          }
         }
-    
-        // Remove os estilos existentes do usuário
-        await this.prisma.userEstilo.deleteMany({
-            where: { userId },
-        });
-    
-        // Adiciona os novos estilos
-        const userStyles = styles.map(styleId => ({
-            userId,
-            estiloId: styleId,
-        }));
-    
-        return this.prisma.userEstilo.createMany({
-            data: userStyles,
-        });
-    }
     
 }

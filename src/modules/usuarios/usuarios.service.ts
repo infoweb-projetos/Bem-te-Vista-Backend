@@ -83,7 +83,17 @@ export class UsuariosService {
 
     async updateStyles(userId: string, styles: string[]) {
         console.log('Atualizando estilos para o usuário:', userId); // Adicionar log para verificar o ID
-      
+
+        if (!userId) {
+            throw new Error('ID do usuário não fornecido');
+        }
+    
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new Error(`Usuário com ID ${userId} não encontrado`);
+        }
+    
+
         try {
           const user = await this.prisma.user.findUnique({
             where: { id: userId },

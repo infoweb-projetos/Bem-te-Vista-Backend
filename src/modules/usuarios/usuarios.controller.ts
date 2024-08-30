@@ -28,8 +28,12 @@ export class UsuariosController {
 
 
   @Post(':id/styles')
-async updateStyles(@Param('id') userId: string, @Body() body: { styles: string[] }) {
-    return this.usuariosService.updateStyles(userId, body.styles);
+async updateStyles(@Param('id') userId: string, @Body() estilos: string[] ) {
+    console.log(userId);
+    console.log(estilos);
+    
+    
+    return this.usuariosService.updateStyles(userId, estilos);
 }
 
 }

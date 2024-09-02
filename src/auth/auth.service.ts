@@ -32,26 +32,46 @@ export class AuthService {
   }
   
 
+  // async login(loginDto: LoginDto) {
+  //   const { email, senha } = loginDto;
+
+  //   // Busca o usuário pelo email
+  //   const user = await this.usersService.findByEmail(email);
+
+  //   // Verifica se o usuário existe e a senha está correta
+  //   if (!user || !(await this.verifyPassword(senha, user.senha))) {
+  //     throw new UnauthorizedException('Invalid credentials');
+  //   }
+
+  //   // Cria o payload para o token JWT
+  //   const payload = { email: user.email, sub: user.id };
+
+  //   // Gera o token JWT
+  //   return {
+  //     access_token: this.jwtService.sign(payload),
+  //   };
+  // }
+
   async login(loginDto: LoginDto) {
     const { email, senha } = loginDto;
-
-    // Busca o usuário pelo email
+  
     const user = await this.usersService.findByEmail(email);
-
-    // Verifica se o usuário existe e a senha está correta
+  
     if (!user || !(await this.verifyPassword(senha, user.senha))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+  
     // Cria o payload para o token JWT
     const payload = { email: user.email, sub: user.id };
-
+  
     // Gera o token JWT
     return {
       access_token: this.jwtService.sign(payload),
+      userId: user.id, // Inclua o ID do usuário na resposta
+      username: user.nome_de_usuario // Inclua o username na resposta
     };
   }
-
+  
   // Função para verificar se a senha informada é a mesma do usuário
   private async verifyPassword(inputPassword: string, storedPassword: string): Promise<boolean> {
     return bcrypt.compare(inputPassword, storedPassword);

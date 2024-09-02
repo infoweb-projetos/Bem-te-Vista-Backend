@@ -5,6 +5,10 @@ export class EstiloDTO {
     nome: string;        // Nome do estilo
   }
 
-  export class UpdateStylesDto {
-    styles: string[];
+  import { IsArray, IsString } from 'class-validator';
+
+export class UpdateStylesDto {
+  @IsArray()
+  @IsString({ each: true })
+  styles: string[];
 }

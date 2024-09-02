@@ -7,33 +7,31 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  async create(@Body() data: UsuarioDTO){
+  async create(@Body() data: UsuarioDTO) {
     return this.usuariosService.create(data);
   }
 
   @Get()
-  async findAll(){
+  async findAll() {
     return this.usuariosService.findAll();
   }
 
   @Put(":id")
-  async update(@Param("id") id: string, @Body() data: UsuarioDTO){
+  async update(@Param("id") id: string, @Body() data: UsuarioDTO) {
     return this.usuariosService.update(id, data);
   }
 
   @Delete(":id")
-  async delete(@Param('id') id: string){
+  async delete(@Param('id') id: string) {
     return this.usuariosService.delete(id);
   }
 
-
   @Post(':id/styles')
-async updateStyles(@Param('id') userId: string, @Body() estilos: string[] ) {
+  async updateStyles(@Param('id') userId: string, @Body() body: { styles: string[] }) {
+    const { styles } = body;
     console.log(userId);
-    console.log(estilos);
+    console.log(styles);
     
-    
-    return this.usuariosService.updateStyles(userId, estilos);
-}
-
+    return this.usuariosService.updateStyles(userId, styles);
+  }
 }

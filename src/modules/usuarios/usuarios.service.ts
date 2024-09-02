@@ -9,32 +9,23 @@ export class UsuariosService {
     constructor(private prisma: PrismaService) {}
 
     async create(data: UsuarioDTO) {
-        // Hash da senha do usuário
         const hashedPassword = await bcrypt.hash(data.senha, 10);
     
-        // Verifica se o usuário já existe
         const userExists = await this.prisma.user.findFirst({
-            where: {
-                email: data.email,
-            },
+            where: { email: data.email },
         });
         
         if (userExists) {
             throw new Error('Email já cadastrado');
         }
         
-        // Cria o novo usuário com a senha criptografada
         const user = await this.prisma.user.create({
-            data: {
-                ...data,
-                senha: hashedPassword,
-            },
+            data: { ...data, senha: hashedPassword },
         });
     
         return user;
     }
     
-
     async findAll(){
         return this.prisma.user.findMany();
     }
@@ -42,48 +33,36 @@ export class UsuariosService {
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
             where: { email },
+            select: { id: true, email: true, nome_de_usuario: true, senha: true },
         });
     }
     
     async update(id: string, data: UsuarioDTO){
-        const userExists = await this.prisma.user.findUnique({
-            where: {
-                id,
-            },
-        })
+        const userExists = await this.prisma.user.findUnique({ where: { id } });
 
         if(!userExists) {
             throw new Error('Esse usuário não existe');
         }
-        return await this.prisma.user.update({
-            data,
-            where: {
-                id,
-            }
-        })
+        return this.prisma.user.update({ data, where: { id } });
     }
     
     async delete(id: string){
-        const userExists = await this.prisma.user.findUnique({
-            where: {
-                id,
-            },
-        });
+        const userExists = await this.prisma.user.findUnique({ where: { id } });
 
         if(!userExists) {
             throw new Error('Esse usuário não existe');
         }
 
-        return await this.prisma.user.delete({
-            where: {
-                id,
-            },
-        });
+        return this.prisma.user.delete({ where: { id } });
     }
 
     async updateStyles(userId: string, styles: string[]) {
-        console.log('Atualizando estilos para o usuário:', userId); // Adicionar log para verificar o ID
-
+        console.log('Atualizando estilos para o usuário:', userId);
+        console.log('Estilos recebidos:', styles);
+      
+        if (!Array.isArray(styles)) {
+          throw new Error('Os estilos fornecidos não são um array.');
+        }
         if (!userId) {
             throw new Error('ID do usuário não fornecido');
         }
@@ -92,49 +71,34 @@ export class UsuariosService {
         if (!user) {
             throw new Error(`Usuário com ID ${userId} não encontrado`);
         }
-    
 
         try {
-          const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-          });
+            const validStyles = await Promise.all(
+                styles.map(async (styleId) => {
+                    const style = await this.prisma.estilo.findUnique({
+                        where: { id: styleId },
+                    });
+                    return style;
+                })
+            );
       
-          if (!user) {
-            throw new Error(`Usuário com ID ${userId} não encontrado`); // Mensagem de erro mais específica
-          }
+            const invalidStyles = validStyles.filter((style) => !style);
+            if (invalidStyles.length > 0) {
+                throw new Error(`Os seguintes estilos não foram encontrados: ${invalidStyles.map(s => s.id).join(', ')}`);
+            }
       
-          // Validar os estilos
-          const validStyles = await Promise.all(
-            styles.map(async (styleId) => {
-              const style = await this.prisma.estilo.findUnique({
-                where: { id: styleId },
-              });
-              return style;
-            })
-          );
-      
-          const invalidStyles = validStyles.filter((style) => !style);
-          if (invalidStyles.length > 0) {
-            throw new Error(`Os seguintes estilos não foram encontrados: ${invalidStyles.join(', ')}`);
-          }
-      
-          // Transação para garantir a consistência dos dados
-          await this.prisma.$transaction(async (prisma) => {
-            // Remover associações existentes
-            await prisma.userEstilo.deleteMany({ where: { userId } });
-      
-            // Criar novas associações
-            await prisma.userEstilo.createMany({
-              data: validStyles.map((style) => ({
-                userId,
-                estiloId: style.id,
-              })),
+            await this.prisma.$transaction(async (prisma) => {
+                await prisma.userEstilo.deleteMany({ where: { userId } });
+                await prisma.userEstilo.createMany({
+                    data: validStyles.map((style) => ({
+                        userId,
+                        estiloId: style.id,
+                    })),
+                });
             });
-          });
-        }  catch (error) {
+        } catch (error) {
             console.error('Erro ao atualizar estilos:', error);
             throw new Error('Ocorreu um erro ao atualizar os estilos.');
-          }
         }
-    
+    }
 }

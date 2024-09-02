@@ -46,14 +46,24 @@ export class UsuariosService {
         return this.prisma.user.update({ data, where: { id } });
     }
     
-    async delete(id: string){
+    async delete(id: string) {
         const userExists = await this.prisma.user.findUnique({ where: { id } });
-
-        if(!userExists) {
+    
+        if (!userExists) {
             throw new Error('Esse usuário não existe');
         }
-
-        return this.prisma.user.delete({ where: { id } });
+    
+        return this.prisma.$transaction(async (prisma) => {
+            // Apaga as associações do usuário na tabela associativa
+            await prisma.userEstilo.deleteMany({
+                where: { userId: id },
+            });
+    
+            // Agora apaga o usuário
+            return prisma.user.delete({
+                where: { id },
+            });
+        });
     }
 
     async updateStyles(userId: string, styles: string[]) {

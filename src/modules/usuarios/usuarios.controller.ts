@@ -23,6 +23,8 @@ export class UsuariosController {
 
   @Delete(":id")
   async delete(@Param('id') id: string) {
+    console.log(id);
+    
     return this.usuariosService.delete(id);
   }
 

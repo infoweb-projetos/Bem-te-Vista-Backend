@@ -68,7 +68,8 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
       userId: user.id, // Inclua o ID do usuário na resposta
-      username: user.nome_de_usuario // Inclua o username na resposta
+      username: user.nome_de_usuario, // Inclua o username na resposta
+      nome: user.nome
     };
   }
   

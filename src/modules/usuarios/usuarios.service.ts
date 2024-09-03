@@ -66,6 +66,16 @@ export class UsuariosService {
         });
     }
 
+    async findUserWithStyles(userId: string) {
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+          include: {
+            estilos: true, // Inclui os estilos relacionados ao usuário
+          },
+        });
+        return user;
+      }
+
     async updateStyles(userId: string, styles: string[]) {
         console.log('Atualizando estilos para o usuário:', userId);
         console.log('Estilos recebidos:', styles);

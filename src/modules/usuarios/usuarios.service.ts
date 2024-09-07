@@ -67,13 +67,33 @@ export class UsuariosService {
     }
 
     async findUserWithStyles(userId: string) {
-        const user = await this.prisma.user.findUnique({
-          where: { id: userId },
-          include: {
-            estilos: true, // Inclui os estilos relacionados ao usuário
-          },
-        });
-        return user;
+        try {
+          const userWithStyles = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+              estilos: {
+                select: {
+                  estilo: true, // Inclui os detalhes do estilo associado
+                },
+              },
+            },
+          });
+    
+          if (!userWithStyles) {
+            throw new Error(`Usuário com ID ${userId} não encontrado`);
+          }
+    
+          // Mapeia os estilos para retornar apenas os campos relevantes (id e nome)
+          const estilosMapeados = userWithStyles.estilos.map((userEstilo) => ({
+            estiloId: userEstilo.estilo.id,
+            nome: userEstilo.estilo.nome,
+          }));
+    
+          return estilosMapeados;
+        } catch (error) {
+          console.error('Erro ao buscar estilos do usuário:', error);
+          throw new Error('Erro ao buscar estilos do usuário');
+        }
       }
 
     async updateStyles(userId: string, styles: string[]) {

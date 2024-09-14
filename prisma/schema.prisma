@@ -14,6 +14,8 @@ model User {
   email           String       @unique
   senha           String
   estilos         UserEstilo[] // Removei a especificação de relacionamento aqui para o padrão.
+  postagens       Postagem[]
+  comentarios      Comentario[]
 
   @@map("Usuarios")
 }
@@ -32,4 +34,30 @@ model UserEstilo {
   estilo   Estilo @relation(fields: [estiloId], references: [id])
 
   @@id([userId, estiloId])
+}
+
+model Postagem {
+  id        String       @id @default(uuid())
+  titulo    String
+  conteudo  String
+  foto      String?      // Caminho ou URL da foto (opcional)
+  criadoEm  DateTime     @default(now())
+  atualizadoEm DateTime  @updatedAt
+  autorId   String       // Chave estrangeira para o autor (usuário)
+  autor     User         @relation(fields: [autorId], references: [id])
+  comentarios Comentario[] // Relacionamento com comentários
+
+  @@map("Postagens")
+}
+
+model Comentario {
+  id        String     @id @default(uuid())
+  conteudo  String
+  criadoEm  DateTime   @default(now())
+  postagemId String    // Chave estrangeira para a postagem
+  postagem  Postagem   @relation(fields: [postagemId], references: [id])
+  autorId   String     // Chave estrangeira para o autor (usuário)
+  autor     User       @relation(fields: [autorId], references: [id])
+
+  @@map("Comentarios")
 }

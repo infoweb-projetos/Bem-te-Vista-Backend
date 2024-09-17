@@ -1,9 +1,13 @@
+import { IsString, IsOptional } from 'class-validator';
+
 export class PostagemDTO {
-    titulo: string;
-    conteudo: string;
-    foto?: string; // Foto é opcional
-   
-  }
+  @IsString()
+  conteudo: string;
+
+  @IsOptional()
+  @IsString()
+  foto?: string;
+}
   
   export class ComentarioDTO {
     conteudo: string;

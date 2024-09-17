@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'src/database/PrismaService';
 import { PostagemDTO, ComentarioDTO } from './postagem.dto';
 
@@ -7,12 +7,20 @@ export class PostagensService {
   constructor(private prisma: PrismaService) {}
 
   async createPost(userId: string, data: PostagemDTO) {
-    return this.prisma.postagem.create({
-      data: {
-        ...data,
-        autorId: userId, // Define o autor da postagem
-      },
-    });
+    try {
+      return await this.prisma.postagem.create({
+        data: {
+          conteudo: data.conteudo, // Corrigido para usar o valor real
+          foto: data.foto, // Pode ser undefined ou uma string
+          autor: {
+            connect: { id: userId },
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw new InternalServerErrorException('Could not create post');
+    }
   }
 
   async findAllPosts() {

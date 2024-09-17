@@ -37,14 +37,13 @@ model UserEstilo {
 }
 
 model Postagem {
-  id        String       @id @default(uuid())
-  titulo    String
-  conteudo  String
-  foto      String?      // Caminho ou URL da foto (opcional)
-  criadoEm  DateTime     @default(now())
-  atualizadoEm DateTime  @updatedAt
-  autorId   String       // Chave estrangeira para o autor (usuário)
-  autor     User         @relation(fields: [autorId], references: [id])
+  id          String       @id @default(uuid())
+  conteudo    String
+  foto        String?      // Caminho ou URL da imagem (opcional)
+  criadoEm    DateTime     @default(now())
+  atualizadoEm DateTime    @updatedAt
+  autorId     String       // Chave estrangeira para o autor (usuário)
+  autor       User         @relation(fields: [autorId], references: [id])
   comentarios Comentario[] // Relacionamento com comentários
 
   @@map("Postagens")

@@ -54,6 +54,15 @@ export class UsuariosService {
         }
     
         return this.prisma.$transaction(async (prisma) => {
+            // Apaga as postagens do usuário
+            await prisma.postagem.deleteMany({
+                where: { autorId: id }, // Supondo que 'autorId' é o campo que associa a postagem ao usuário
+            });
+
+            await prisma.comentario.deleteMany({
+                where: { autorId: id }, // Chave estrangeira para comentários (se houver)
+            });
+    
             // Apaga as associações do usuário na tabela associativa
             await prisma.userEstilo.deleteMany({
                 where: { userId: id },
@@ -65,6 +74,7 @@ export class UsuariosService {
             });
         });
     }
+    
 
     async findUserWithStyles(userId: string) {
         try {
@@ -141,4 +151,10 @@ export class UsuariosService {
             throw new Error('Ocorreu um erro ao atualizar os estilos.');
         }
     }
+
+    async findByUsername(nome_de_usuario: string) {
+        return this.prisma.user.findUnique({
+          where: { nome_de_usuario },
+        });
+}
 }

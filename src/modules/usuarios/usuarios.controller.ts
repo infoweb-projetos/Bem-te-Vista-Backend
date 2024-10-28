@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Delete, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Delete, Param, } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { UsuarioDTO } from './usuario.dto';
 
@@ -39,5 +39,10 @@ export class UsuariosController {
     console.log(styles);
     
     return this.usuariosService.updateStyles(userId, styles);
+  }
+
+  @Get('profile/:username')
+  async getUserProfile(@Param('username') username: string) {
+    return this.usuariosService.findByUsername(username);
   }
 }

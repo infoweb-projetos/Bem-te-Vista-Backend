@@ -13,7 +13,7 @@ export class PostagensController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('imagem', {
+  @UseInterceptors(FileInterceptor('foto', {
     storage: diskStorage({
       destination: './uploads',
       filename: (req, file, callback) => {

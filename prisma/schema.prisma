@@ -16,6 +16,7 @@ model User {
   estilos         UserEstilo[] // Removei a especificação de relacionamento aqui para o padrão.
   postagens       Postagem[]
   comentarios      Comentario[]
+  bio             String?
 
   @@map("Usuarios")
 }

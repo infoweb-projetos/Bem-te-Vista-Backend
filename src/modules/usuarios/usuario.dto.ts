@@ -4,4 +4,5 @@ export type UsuarioDTO = {
     nome_de_usuario: string;
     email: string;
     senha: string;
+    bio?: string;
 }

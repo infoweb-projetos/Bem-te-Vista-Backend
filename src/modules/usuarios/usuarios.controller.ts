@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Put, Delete, Param, } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Delete, Param, Patch, } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { UsuarioDTO } from './usuario.dto';
+import { UsuarioUpdate } from './usuario.edit';
 
 @Controller('users')
 export class UsuariosController {
@@ -16,15 +17,15 @@ export class UsuariosController {
     return this.usuariosService.findAll();
   }
 
-  @Put(":id")
-  async update(@Param("id") id: string, @Body() data: UsuarioDTO) {
+  @Patch(":id")
+  async update(@Param("id") id: string, @Body() data: UsuarioUpdate) {
+    // console.log(data);
+    
     return this.usuariosService.update(id, data);
   }
 
   @Delete(":id")
   async delete(@Param('id') id: string) {
-    console.log(id);
-    
     return this.usuariosService.delete(id);
   }
   @Get(':id/styles')

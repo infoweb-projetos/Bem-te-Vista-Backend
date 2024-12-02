@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsuarioDTO } from './usuario.dto';
 import { PrismaService } from 'src/database/PrismaService';
 import * as bcrypt from 'bcrypt';
+import { UsuarioUpdate } from './usuario.edit';
 
 @Injectable()
 export class UsuariosService {
@@ -37,12 +38,13 @@ export class UsuariosService {
         });
     }
     
-    async update(id: string, data: UsuarioDTO){
+    async update(id: string, data: UsuarioUpdate){
         const userExists = await this.prisma.user.findUnique({ where: { id } });
 
         if(!userExists) {
             throw new Error('Esse usuário não existe');
         }
+        
         return this.prisma.user.update({ data, where: { id } });
     }
     
@@ -126,7 +128,7 @@ export class UsuariosService {
             const validStyles = await Promise.all(
                 styles.map(async (styleId) => {
                     const style = await this.prisma.estilo.findUnique({
-                        where: { id: styleId },
+                        where: { nome: styleId },
                     });
                     return style;
                 })

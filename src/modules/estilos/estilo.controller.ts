@@ -24,6 +24,7 @@ export class EstilosController {
 
   @Put(":id")
   async update(@Param("id") id: string, @Body() data: EstiloDTO) {
+    console.info(data)
     return this.estilosService.update(id, data);
   }
 

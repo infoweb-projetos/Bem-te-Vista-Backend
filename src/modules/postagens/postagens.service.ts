@@ -58,8 +58,16 @@ export class PostagensService {
   }
 
   async deletePost(id: string) {
-    return this.prisma.postagem.delete({
-      where: { id },
+    return this.prisma.$transaction(async (prisma) => {
+      // Exclui os comentários associados à postagem
+      await prisma.comentario.deleteMany({
+        where: { postagemId: id },
+      });
+  
+      // Exclui a postagem
+      return prisma.postagem.delete({
+        where: { id },
+      });
     });
   }
 

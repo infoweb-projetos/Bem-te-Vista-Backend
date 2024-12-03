@@ -72,4 +72,25 @@ export class PostagensService {
       },
     });
   }
+
+  //async toggleLike(postId: string, userId: string) {
+    //const existingLike = await this.prisma.like.findUnique({
+     // where: { postId_userId: { postId, userId } },
+    //});
+  
+   // if (existingLike) {
+      // Remove o like
+   //   await this.prisma.like.delete({
+  //      where: { id: existingLike.id },
+  //    });
+  //    return { liked: false };
+  //  } else {
+      // Adiciona o like
+  //    await this.prisma.like.create({
+  //      data: { postId, userId },
+  //    });
+  //    return { liked: true };
+   // }
+ // }
+  
 }

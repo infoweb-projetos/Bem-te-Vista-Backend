@@ -81,24 +81,26 @@ export class PostagensService {
     });
   }
 
-  //async toggleLike(postId: string, userId: string) {
-    //const existingLike = await this.prisma.like.findUnique({
-     // where: { postId_userId: { postId, userId } },
-    //});
-  
-   // if (existingLike) {
-      // Remove o like
-   //   await this.prisma.like.delete({
-  //      where: { id: existingLike.id },
-  //    });
-  //    return { liked: false };
-  //  } else {
-      // Adiciona o like
-  //    await this.prisma.like.create({
-  //      data: { postId, userId },
-  //    });
-  //    return { liked: true };
-   // }
- // }
+  async toggleLike(postagemId: string, autorId: string) {
+    const existingLike = await this.prisma.like.findUnique({
+      where: {
+        autorId_postagemId: { autorId, postagemId },
+      },
+    });
+
+    if (existingLike) {
+      // Remover curtida
+      await this.prisma.like.delete({
+        where: { id: existingLike.id },
+      });
+      return { liked: false };
+    } else {
+      // Adicionar curtida
+      await this.prisma.like.create({
+        data: { postagemId, autorId },
+      });
+      return { liked: true };
+    }
+  }
   
 }

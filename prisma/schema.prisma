@@ -15,8 +15,10 @@ model User {
   senha           String
   estilos         UserEstilo[] // Removei a especificação de relacionamento aqui para o padrão.
   postagens       Postagem[]
-  comentarios      Comentario[]
+  comentarios     Comentario[]
   bio             String?
+  likes           Like[]
+  foto            String?
 
   @@map("Usuarios")
 }
@@ -46,6 +48,7 @@ model Postagem {
   autorId     String       // Chave estrangeira para o autor (usuário)
   autor       User         @relation(fields: [autorId], references: [id])
   comentarios Comentario[] // Relacionamento com comentários
+  likes       Like[]
 
   @@map("Postagens")
 }
@@ -60,4 +63,15 @@ model Comentario {
   autor     User       @relation(fields: [autorId], references: [id])
 
   @@map("Comentarios")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  autor      User     @relation(fields: [autorId], references: [id])
+  autorId    String
+  postagem  Postagem     @relation(fields: [postagemId], references: [id])
+  postagemId    String
+
+  @@unique([autorId, postagemId]) // Garante que um usuário possa curtir uma postagem apenas uma vez
 }

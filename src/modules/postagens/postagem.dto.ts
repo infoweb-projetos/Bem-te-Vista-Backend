@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty,} from 'class-validator';
 
 export class PostagemDTO {
   @IsString()
@@ -7,6 +7,9 @@ export class PostagemDTO {
   @IsOptional()
   @IsString()
   foto?: string;
+
+  @IsOptional()
+  likes: number; // Campo para curtidas
 }
 
 export class ComentarioDTO {

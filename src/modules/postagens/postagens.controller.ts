@@ -82,10 +82,12 @@ async deletePost(@Param('id') id: string, @Request() req) {
     return this.postagensService.createComment(postId, req.user.userId, data);
   }
 
-    //@Post('posts/:id/like')
-  //async toggleLike(@Param('id') postId: string, @Body() body: { userId: string }) {
-   // const post = await this.postagens.service.toggleLike(postId, body.userId);
-   // return post;
-  //}
+  @Post(':postId/like')
+  async toggleLike(
+    @Param('postId') postId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.postagensService.toggleLike(postId, userId);
+  }
 
 }
